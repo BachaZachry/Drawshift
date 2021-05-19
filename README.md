@@ -6,4 +6,4 @@
   
 ## Front-end Dev:
   ### docker pull bragdon/drawshift
-  ### docker-compose run --rm app python manage.py runserver
+  ### docker-compose up
