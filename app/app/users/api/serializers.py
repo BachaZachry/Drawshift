@@ -32,3 +32,25 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+class SocialSerializer(serializers.Serializer):
+    """
+       Serializer which accepts an OAuth2 access token.
+    """
+    access_token = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True
+    )
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email']
+
+class KnoxSerializer(serializers.Serializer):
+    """
+    Serializer for Knox authentication.
+    """
+    token = serializers.CharField()
+    user = serializers.CharField()
+    email = serializers.CharField()

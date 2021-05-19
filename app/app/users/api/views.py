@@ -1,8 +1,13 @@
-from rest_framework import generics,permissions
-from .serializers import LoginSerializer,RegisterSerializer,UserSerializer
+from rest_framework import generics,permissions,mixins
+from .serializers import LoginSerializer,RegisterSerializer,UserSerializer,\
+    KnoxSerializer,
 from users.models import User
 from rest_framework.response import Response
 from knox.models import AuthToken
+from allauth.account.adapter import get_adapter
+from dj_rest_auth.views import LoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from dj_rest_auth.registration.serializers import SocialLoginSerializer
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -46,3 +51,30 @@ class LoadUser(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+class KnoxLoginView(LoginView):
+    serializer_class = KnoxSerializer
+
+    def get_response(self):
+        serializer_class = self.get_response_serializer()
+        data = {
+            'token': self.token,
+            'user': self.user.username,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'email': self.user.email
+        }
+        serializer = serializer_class(instance=data)
+
+        return Response(serializer.data, status=200)
+
+
+class SocialLoginView(KnoxLoginView):
+    serializer_class = SocialLoginSerializer
+
+    def process_login(self):
+        get_adapter(self.request).login(self.request, self.user)
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter

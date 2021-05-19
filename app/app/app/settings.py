@@ -47,6 +47,14 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     #CORS
     'corsheaders',
+    #Social Oauth
+    'django.contrib.sites',
+    'dj_rest_auth',
+    'allauth',
+    'allauth.account',
+    'dj_rest_auth.registration',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -114,6 +122,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -144,4 +156,21 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
     ),
+}
+
+#CORS
+CORS_ALLOW_ALL_ORIGINS = True
+
+#Social Oauth
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER' : 'users.api.serializers.LoginSerializer',
+}
+REST_AUTH_TOKEN_MODEL = 'knox.models.AuthToken'
+REST_AUTH_TOKEN_CREATOR = 'users.utils.create_knox_token'
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER':'users.api.serializers.RegisterSerializer',
+}
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER':'users.api.serializers.UserDetailsSerializer',
+    'TOKEN_SERIALIZER':'users.api.serializers.KnoxSerializer'
 }
