@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from users.models import User
+from users.models import User, Invite
+from rest_framework.fields import CurrentUserDefault
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -54,3 +55,16 @@ class KnoxSerializer(serializers.Serializer):
     token = serializers.CharField()
     user = serializers.CharField()
     email = serializers.CharField()
+
+
+class InviteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invite
+        fields = ['sender', 'receiver', 'status']
+        extra_kwargs = {'sender':{'default':CurrentUserDefault()}}
+
+
+class InviteResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invite
+        fields = ['sender', 'receiver', 'status']

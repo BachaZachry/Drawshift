@@ -1,7 +1,7 @@
 from rest_framework import generics,permissions,mixins
-from .serializers import LoginSerializer,RegisterSerializer,UserSerializer,\
+from .serializers import InviteSerializer, LoginSerializer,RegisterSerializer,UserSerializer,\
     KnoxSerializer,
-from users.models import User
+from users.models import User, Invite
 from rest_framework.response import Response
 from knox.models import AuthToken
 from allauth.account.adapter import get_adapter
@@ -78,3 +78,41 @@ class SocialLoginView(KnoxLoginView):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+
+class InviteAPIView(generics.GenericAPIView):
+    serializer_class = InviteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self,request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        #Creating the invite
+        invite = serializer.save()
+        return Response({
+            'Invite':InviteSerializer(invite,context=self.get_serializer_context()).data,
+            'Invite Id':invite.pk,
+        })
+
+
+class RespondToAnInvitation(generics.RetrieveUpdateAPIView):
+    serializer_class = InviteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Invite.objects.all()
+
+    def get_queryset(self):
+        serializer = self.get_serializer()
+        receiver = serializer.context['request'].user
+        #Return only the invitations sent to that specific user
+        return Invite.objects.filter(receiver=receiver)
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data['status'] == 'A':
+            receiver = serializer.context['request'].user
+            sender_id = serializer.validated_data['sender']
+            sender = User.objects.get(pk=sender_id)
+            #Handling Teams
+            #To be done next Sprint
+            #Modifying Team attributes
+        return self.update(request,*args,**kwargs)
