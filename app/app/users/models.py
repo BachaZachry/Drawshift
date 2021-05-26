@@ -7,7 +7,7 @@ class User(AbstractUser):
     pass
 
 
-class Invite(models):
+class Invite(models.Model):
     STATUS_CHOICE = (
         ('P', 'Pending'),
         ('A', 'Accepted'),
