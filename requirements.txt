@@ -7,3 +7,4 @@ django-cors-headers==3.7.0
 pytest-django==4.2.0
 dj-rest-auth==2.1.4
 django-allauth==0.44.0
+channels-redis==3.2.0

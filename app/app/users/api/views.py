@@ -1,6 +1,6 @@
 from rest_framework import generics,permissions,mixins
 from .serializers import InviteSerializer, LoginSerializer,RegisterSerializer,UserSerializer,\
-    KnoxSerializer,
+    KnoxSerializer
 from users.models import User, Invite
 from rest_framework.response import Response
 from knox.models import AuthToken
