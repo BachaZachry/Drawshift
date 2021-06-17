@@ -2,10 +2,22 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+import uuid
+
+
+def generate_unique_string():
+    not_unique = True
+    while not_unique:
+        name = uuid.uuid4().hex[:6]
+        if not Team.objects.filter(name=name).exists():
+            not_unique = False
+
+    return name
 
 
 class Team(models.Model):
-    name = models.CharField(max_length=256, unique=True, null=False)
+    name = models.CharField(max_length=256, unique=True,
+                            null=False, default=generate_unique_string)
 
 
 class User(AbstractUser):
