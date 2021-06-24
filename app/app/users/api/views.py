@@ -7,6 +7,7 @@ from knox.models import AuthToken
 from allauth.account.adapter import get_adapter
 from dj_rest_auth.views import LoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from dj_rest_auth.registration.serializers import SocialLoginSerializer
 from users.permissions import canInvite, canCreateTeam
 
@@ -82,6 +83,10 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
 
+class GithubLogin(SocialLoginView):
+    adapter_class = GitHubOAuth2Adapter
+
+
 class CreateTeam(generics.GenericAPIView):
     serializer_class = TeamSerializer
     permission_classes = [canCreateTeam]
@@ -134,7 +139,6 @@ class RespondToAnInvitation(generics.RetrieveUpdateAPIView):
             receiver = serializer.context['request'].user
             sender_id = serializer.validated_data['sender']
             sender = User.objects.get(pk=sender_id)
-            # Handling Teams
-            # To be done next Sprint
-            # Modifying Team attributes
+            receiver.team = sender.team
+            receiver.save()
         return self.update(request, *args, **kwargs)
