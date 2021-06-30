@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-!hnd7k7gvp0av@)(e&&n0c74at3$)hxl+eqmxi_jn05$&)8a#7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0','localhost']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 
 # Application definition
@@ -38,16 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #Rest Framework
+    # Rest Framework
     'rest_framework',
-    #Apps
+    # Apps
     'users',
-    #Auth
+    # Auth
     'knox',
     'rest_framework.authtoken',
-    #CORS
+    # CORS
     'corsheaders',
-    #Social Oauth
+    # Social Oauth
     'django.contrib.sites',
     'dj_rest_auth',
     'allauth',
@@ -55,8 +55,14 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-]
+    # Github
+    'allauth.socialaccount.providers.github',
+    # RTC
+    'channels',
+    'chat',
 
+]
+SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -87,6 +93,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
+ASGI_APPLICATION = 'app.asgi.application'
 
 
 # Database
@@ -102,7 +109,7 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL='users.User'
+AUTH_USER_MODEL = 'users.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -151,26 +158,65 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#Rest Auth
+# Rest Auth
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
     ),
 }
 
-#CORS
+# CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
-#Social Oauth
+# Social Oauth
 REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER' : 'users.api.serializers.LoginSerializer',
+    'LOGIN_SERIALIZER': 'users.api.serializers.LoginSerializer',
 }
 REST_AUTH_TOKEN_MODEL = 'knox.models.AuthToken'
 REST_AUTH_TOKEN_CREATOR = 'users.utils.create_knox_token'
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER':'users.api.serializers.RegisterSerializer',
+    'REGISTER_SERIALIZER': 'users.api.serializers.RegisterSerializer',
 }
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER':'users.api.serializers.UserDetailsSerializer',
-    'TOKEN_SERIALIZER':'users.api.serializers.KnoxSerializer'
+    'USER_DETAILS_SERIALIZER': 'users.api.serializers.UserDetailsSerializer',
+    'TOKEN_SERIALIZER': 'users.api.serializers.KnoxSerializer'
+}
+
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'scope': ('user:email'),
+    }
+}
+
+# Redis Setup
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
+
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
 }
