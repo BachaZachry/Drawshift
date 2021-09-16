@@ -168,6 +168,7 @@ REST_FRAMEWORK = {
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 # Social Oauth
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'users.api.serializers.LoginSerializer',
