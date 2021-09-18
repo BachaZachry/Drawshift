@@ -20,4 +20,5 @@ class DrawingAPIView(generics.GenericAPIView):
     def get(self, request):
         serializer = self.get_serializer()
         user = serializer.context['request'].user
-        return Drawing.objects.filter(user=user)
+        print(Drawing.objects.filter(user=user))
+        return Response(Drawing.objects.filter(user=user).values())
