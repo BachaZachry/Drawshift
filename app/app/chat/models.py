@@ -1,8 +1,9 @@
 from django.db import models
 from users.models import User
+from django.contrib.postgres.fields import ArrayField
 
 
 class Drawing(models.Model):
-    svg_file = models.FileField(upload_to="svg_saves")
+    path = ArrayField(models.JSONField(), default=[])
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=False, default="")
