@@ -7,3 +7,9 @@ class Drawing(models.Model):
     path = ArrayField(models.JSONField(), default=[])
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=False, default="")
+
+
+class Diagram(models.Model):
+    elements = ArrayField(models.JSONField())
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, null=False)
