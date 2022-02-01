@@ -1,7 +1,5 @@
-from app.app.chat.api.serializers import DiagramSerializer
-from app.app.chat.models import Diagram
-from chat.api.serializers import DrawingSerializer
-from chat.models import Drawing
+from chat.api.serializers import DrawingSerializer, DiagramSerializer
+from chat.models import Drawing, Diagram
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 

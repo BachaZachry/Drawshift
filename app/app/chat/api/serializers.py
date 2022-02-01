@@ -1,5 +1,5 @@
-from app.app.chat.models import Diagram
-from chat.models import Drawing
+
+from chat.models import Drawing, Diagram
 from rest_framework import serializers
 
 
