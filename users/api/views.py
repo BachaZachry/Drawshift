@@ -1,6 +1,12 @@
-from rest_framework import generics, permissions, mixins
-from .serializers import InviteSerializer, LoginSerializer, RegisterSerializer, TeamSerializer, \
-    KnoxSerializer, UserSerializer
+from rest_framework import generics, permissions
+from .serializers import (
+    InviteSerializer,
+    LoginSerializer,
+    RegisterSerializer,
+    TeamSerializer,
+    KnoxSerializer,
+    UserSerializer,
+)
 from users.models import User, Invite
 from rest_framework.response import Response
 from knox.models import AuthToken
@@ -23,11 +29,15 @@ class RegisterAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         # save user
         user = serializer.save()
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            # Sending a token for an immediate login
-            "token": AuthToken.objects.create(user)[1]
-        })
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                # Sending a token for an immediate login
+                "token": AuthToken.objects.create(user)[1],
+            }
+        )
 
 
 class LoginAPI(generics.GenericAPIView):
@@ -40,10 +50,12 @@ class LoginAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         token = AuthToken.objects.create(user)
-        return Response({
-            'token': token[1],
-            'username': user.username,
-        })
+        return Response(
+            {
+                "token": token[1],
+                "username": user.username,
+            }
+        )
 
 
 class LoadUser(generics.RetrieveAPIView):
@@ -61,11 +73,11 @@ class KnoxLoginView(LoginView):
     def get_response(self):
         serializer_class = self.get_response_serializer()
         data = {
-            'token': self.token,
-            'user': self.user.username,
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name,
-            'email': self.user.email
+            "token": self.token,
+            "user": self.user.username,
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "email": self.user.email,
         }
         serializer = serializer_class(instance=data)
 
@@ -100,10 +112,7 @@ class CreateTeam(generics.GenericAPIView):
         user.is_leader, user.can_invite = True, True
         user.save()
 
-        return Response({
-            "Team": team.id,
-            "user": user.id
-        })
+        return Response({"Team": team.id, "user": user.id})
 
 
 class InviteAPIView(generics.GenericAPIView):
@@ -115,10 +124,14 @@ class InviteAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         # Creating the invite
         invite = serializer.save()
-        return Response({
-            'Invite': InviteSerializer(invite, context=self.get_serializer_context()).data,
-            'Invite Id': invite.pk,
-        })
+        return Response(
+            {
+                "Invite": InviteSerializer(
+                    invite, context=self.get_serializer_context()
+                ).data,
+                "Invite Id": invite.pk,
+            }
+        )
 
 
 class RespondToAnInvitation(generics.RetrieveUpdateAPIView):
@@ -128,16 +141,16 @@ class RespondToAnInvitation(generics.RetrieveUpdateAPIView):
 
     def get_queryset(self):
         serializer = self.get_serializer()
-        receiver = serializer.context['request'].user
+        receiver = serializer.context["request"].user
         # Return only the invitations sent to that specific user
         return Invite.objects.filter(receiver=receiver)
 
     def put(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['status'] == 'A':
-            receiver = serializer.context['request'].user
-            sender_id = serializer.validated_data['sender']
+        if serializer.validated_data["status"] == "A":
+            receiver = serializer.context["request"].user
+            sender_id = serializer.validated_data["sender"]
             sender = User.objects.get(pk=sender_id)
             receiver.team = sender.team
             receiver.save()

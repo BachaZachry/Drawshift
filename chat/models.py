@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Drawing(models.Model):
-    path = ArrayField(models.JSONField(), default=[])
+    path = ArrayField(models.JSONField(), default=list())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=False, default="")
 

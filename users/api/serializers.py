@@ -7,7 +7,7 @@ from rest_framework.fields import CurrentUserDefault
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', ]
+        fields = ["id", "username", "email"]
 
 
 class LoginSerializer(serializers.Serializer):
@@ -20,15 +20,17 @@ class LoginSerializer(serializers.Serializer):
             # return user in case of a successful login
             return user
         # Handle wrong info
-        raise serializers.ValidationError('Incorrect Credentials')
+        raise serializers.ValidationError("Incorrect Credentials")
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # Might be modified in case of adding another fields to the user
-        fields = ['first_name', 'last_name', 'username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ["first_name", "last_name", "username", "email", "password"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -37,24 +39,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class SocialSerializer(serializers.Serializer):
     """
-       Serializer which accepts an OAuth2 access token.
+    Serializer which accepts an OAuth2 access token.
     """
-    access_token = serializers.CharField(
-        allow_blank=False,
-        trim_whitespace=True
-    )
+
+    access_token = serializers.CharField(allow_blank=False, trim_whitespace=True)
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ["id", "username", "email"]
 
 
 class KnoxSerializer(serializers.Serializer):
     """
     Serializer for Knox authentication.
     """
+
     token = serializers.CharField()
     user = serializers.CharField()
     email = serializers.CharField()
@@ -63,14 +64,8 @@ class KnoxSerializer(serializers.Serializer):
 class InviteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invite
-        fields = ['sender', 'receiver', 'status']
-        extra_kwargs = {'sender': {'default': CurrentUserDefault()}}
-
-
-class InviteResponseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Invite
-        fields = ['sender', 'receiver', 'status']
+        fields = ["sender", "receiver", "status"]
+        extra_kwargs = {"sender": {"default": CurrentUserDefault()}}
 
 
 class TeamSerializer(serializers.ModelSerializer):
