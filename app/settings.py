@@ -26,12 +26,13 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -169,22 +170,29 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Social Oauth
-REST_AUTH_SERIALIZERS = {
+REST_AUTH = {
     "LOGIN_SERIALIZER": "users.api.serializers.LoginSerializer",
-}
-REST_AUTH_TOKEN_MODEL = "knox.models.AuthToken"
-REST_AUTH_TOKEN_CREATOR = "users.utils.create_knox_token"
-REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "users.api.serializers.RegisterSerializer",
-}
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "users.api.serializers.UserDetailsSerializer",
     "TOKEN_SERIALIZER": "users.api.serializers.KnoxSerializer",
+    "USER_DETAILS_SERIALIZER": "users.api.serializers.UserDetailsSerializer",
+    "TOKEN_MODEL": "knox.models.AuthToken",
+    "TOKEN_CREATOR": "users.utils.create_knox_token",
+    "REGISTER_SERIALIZER": "users.api.serializers.RegisterSerializer",
 }
 
 SOCIALACCOUNT_PROVIDERS = {
-    "github": {
-        "scope": ("user:email"),
+    "google": {
+        "APP": {
+            "client_id": env("GOOGLE_CLIENT_ID"),
+            "secret": env("GOOGLE_SECRET_KEY"),
+            "key": "",
+        },
+        "SCOPE": {
+            "profile",
+            "email",
+        },
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
     }
 }
 
@@ -194,7 +202,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],
+            "hosts": [("localhost", 6379)],
         },
     },
 }

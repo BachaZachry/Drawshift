@@ -57,8 +57,6 @@ class KnoxSerializer(serializers.Serializer):
     """
 
     token = serializers.CharField()
-    user = serializers.CharField()
-    email = serializers.CharField()
 
 
 class InviteSerializer(serializers.ModelSerializer):

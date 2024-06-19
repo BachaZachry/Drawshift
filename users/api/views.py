@@ -1,4 +1,5 @@
-from rest_framework import generics, permissions
+import json
+from rest_framework import generics, permissions, status
 from .serializers import (
     InviteSerializer,
     LoginSerializer,
@@ -67,28 +68,23 @@ class LoadUser(generics.RetrieveAPIView):
         return self.request.user
 
 
-class KnoxLoginView(LoginView):
-    serializer_class = KnoxSerializer
-
-    def get_response(self):
-        serializer_class = self.get_response_serializer()
-        data = {
-            "token": self.token,
-            "user": self.user.username,
-            "first_name": self.user.first_name,
-            "last_name": self.user.last_name,
-            "email": self.user.email,
-        }
-        serializer = serializer_class(instance=data)
-
-        return Response(serializer.data, status=200)
-
-
-class SocialLoginView(KnoxLoginView):
+class SocialLoginView(LoginView):
     serializer_class = SocialLoginSerializer
 
     def process_login(self):
         get_adapter(self.request).login(self.request, self.user)
+
+    def get_response(self):
+        return Response(
+            {
+                "username": self.user.username,
+                "token": self.token,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+                "email": self.user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class GoogleLogin(SocialLoginView):
