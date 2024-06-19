@@ -14,14 +14,13 @@ from chat.authMiddleware import TokenAuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
 import chat.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
 
-application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    'websocket':
-        TokenAuthMiddlewareStack(
-            URLRouter(
-                chat.routing.websocket_urlpatterns
-            )
-    )
-})
+application = ProtocolTypeRouter(
+    {
+        "http": get_asgi_application(),
+        "websocket": AllowedHostsOriginValidator(
+            TokenAuthMiddlewareStack(URLRouter(chat.routing.websocket_urlpatterns))
+        ),
+    }
+)
