@@ -79,11 +79,10 @@ class SocialLoginView(LoginView):
     def get_response(self):
         return Response(
             {
-                "username": self.user.username,
+                "user": UserSerializer(
+                    self.user, context=self.get_serializer_context()
+                ).data,
                 "token": self.token,
-                "first_name": self.user.first_name,
-                "last_name": self.user.last_name,
-                "email": self.user.email,
             },
             status=status.HTTP_200_OK,
         )
