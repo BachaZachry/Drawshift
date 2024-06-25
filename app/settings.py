@@ -18,7 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
 
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+overrides = {key: os.environ.pop(key, value) for key, value in os.environ.items()}
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"), **overrides)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
