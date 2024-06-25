@@ -5,7 +5,7 @@ from rest_framework import serializers
 class DrawingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drawing
-        fields = ["id", "path", "title", "user"]
+        fields = ["id", "path", "title", "user", "image"]
         extra_kwargs = {"user": {"default": serializers.CurrentUserDefault()}}
 
 
