@@ -6,17 +6,15 @@ from django.db.models.signals import post_save
 import uuid
 
 
-# AbstractUser._meta.get_field("email")._unique = True
+AbstractUser._meta.get_field("email")._unique = True
 
 
 class Team(models.Model):
-    name = models.CharField(
-        max_length=256, unique=True, null=False, default=uuid.uuid4().hex
-    )
+    name = models.CharField(max_length=256, unique=True, null=False)
 
 
 class User(AbstractUser):
-    team = models.ForeignKey(Team, null=True, on_delete=models.SET_NULL)
+    team = models.ForeignKey(Team, null=True, on_delete=models.SET_NULL, blank=True)
     is_leader = models.BooleanField(default=False)
     can_invite = models.BooleanField(default=False)
 
