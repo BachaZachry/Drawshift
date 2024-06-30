@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "channels",
     "chat",
     "storages",
+    # Docs
+    "drf_spectacular",
 ]
 SITE_ID = 1
 MIDDLEWARE = [
@@ -165,6 +167,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Rest Auth
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # CORS
@@ -231,10 +234,9 @@ LOGGING = {
     },
 }
 
-# S3 Setup
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL")
-AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
-AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
-AWS_STORAGE_BUCKET_NAME = env("S3_FILE_BUCKET")
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Drawshift API",
+    "DESCRIPTION": "Backend for a real-time drawings and diagrams collaboration",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
