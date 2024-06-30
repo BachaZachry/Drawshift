@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "channels",
     "chat",
     "storages",
+    # Docs
+    "drf_spectacular",
 ]
 SITE_ID = 1
 MIDDLEWARE = [
@@ -165,6 +167,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Rest Auth
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # CORS
@@ -229,4 +232,11 @@ LOGGING = {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
     },
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Drawshift API",
+    "DESCRIPTION": "Backend for a real-time drawings and diagrams collaboration",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }

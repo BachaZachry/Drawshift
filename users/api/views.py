@@ -1,5 +1,5 @@
 import json
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, serializers
 from .serializers import (
     InviteSerializer,
     LoginSerializer,
@@ -17,12 +17,38 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from dj_rest_auth.registration.serializers import SocialLoginSerializer
 from users.permissions import canInvite, canCreateTeam
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiExample,
+    inline_serializer,
+)
 
 
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        summary="Register a new user",
+        description="Creates a new user account and returns the user data along with an authentication token.",
+        request=RegisterSerializer,
+        responses={
+            201: inline_serializer(
+                name="auth-response",
+                fields={"user": UserSerializer(), "token": serializers.CharField()},
+            )
+        },
+        examples=[
+            OpenApiExample(
+                "Example register request",
+                value={
+                    "username": "newuser",
+                    "password": "securepassword123",
+                },
+                request_only=True,
+            ),
+        ],
+    )
     def post(self, request, *args, **kwargs):
         # get data from request
         serializer = self.get_serializer(data=request.data)
@@ -46,6 +72,27 @@ class LoginAPI(generics.GenericAPIView):
     # Allow anyone to access this view
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        summary="User login",
+        description="Authenticates a user and returns user data along with an authentication token.",
+        request=LoginSerializer,
+        responses={
+            201: inline_serializer(
+                name="auth-response",
+                fields={"user": UserSerializer(), "token": serializers.CharField()},
+            )
+        },
+        examples=[
+            OpenApiExample(
+                "Example login request",
+                value={
+                    "username": "existinguser",
+                    "password": "securepassword123",
+                },
+                request_only=True,
+            ),
+        ],
+    )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -61,6 +108,11 @@ class LoginAPI(generics.GenericAPIView):
         )
 
 
+@extend_schema(
+    summary="Load authenticated user data",
+    description="Retrieves the data of the currently authenticated user.",
+    responses={200: UserSerializer},
+)
 class LoadUser(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -88,14 +140,55 @@ class SocialLoginView(LoginView):
         )
 
 
+@extend_schema(
+    summary="Google OAuth login",
+    description="Authenticates a user using Google OAuth and returns user data along with an authentication token.",
+    request=SocialLoginSerializer,
+    responses={
+        201: inline_serializer(
+            name="auth-response",
+            fields={"user": UserSerializer(), "token": serializers.CharField()},
+        )
+    },
+    examples=[
+        OpenApiExample(
+            "Example google auth request",
+            value={
+                "access_token": "google_access_token",
+            },
+            request_only=True,
+        ),
+    ],
+)
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
 
+@extend_schema(
+    summary="GitHub OAuth login",
+    description="Authenticates a user using GitHub OAuth and returns user data along with an authentication token.",
+    request=SocialLoginSerializer,
+    responses={
+        201: inline_serializer(
+            name="auth-response",
+            fields={"user": UserSerializer(), "token": serializers.CharField()},
+        )
+    },
+    examples=[
+        OpenApiExample(
+            "Example github auth request",
+            value={
+                "access_token": "github_access_token",
+            },
+            request_only=True,
+        ),
+    ],
+)
 class GithubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
 
 
+# Rest of the API endpoints are going to be revamped in the next feature release.
 class CreateTeam(generics.GenericAPIView):
     serializer_class = TeamSerializer
     permission_classes = [canCreateTeam]
