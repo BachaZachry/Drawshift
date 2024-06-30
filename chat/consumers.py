@@ -26,21 +26,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = data.get("user_id")
             await self.broadcast_canvas_update(canvas_data, user)
 
+        if data.get("type") == "diagram_update":
+            diagram_data = data.get("diagram_data")
+            operation = data.get("operation")
+            user = data.get("user_id")
+            await self.broadcast_diagram_update(diagram_data, operation, user)
+
     async def broadcast_canvas_update(self, canvas_data, user):
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "send_canvas_update", "canvas_data": canvas_data, "user": user},
+            {"type": "send_canvas_update", "canvas_data": canvas_data, "user_id": user},
+        )
+
+    async def broadcast_diagram_update(self, diagram_data, operation, user):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "send_diagram_update",
+                "diagram_data": diagram_data,
+                "operation": operation,
+                "user_id": user,
+            },
         )
 
     async def send_canvas_update(self, event):
         canvas_data = event["canvas_data"]
-        user = event["user"]
+        user = event["user_id"]
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "canvas_update",
                     "canvas_data": canvas_data,
-                    "user": user,
+                    "user_id": user,
+                }
+            )
+        )
+
+    async def send_diagram_update(self, event):
+        diagram_data = event["diagram_data"]
+        operation = event["operation"]
+        user = event["user_id"]
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "diagram_update",
+                    "diagram_data": diagram_data,
+                    "operation": operation,
+                    "user_id": user,
                 }
             )
         )
