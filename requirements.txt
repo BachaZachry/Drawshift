@@ -12,3 +12,7 @@ dj-database-url
 requests
 pyjwt
 django-environ
+django-storages
+boto3
+gunicorn
+uvicorn

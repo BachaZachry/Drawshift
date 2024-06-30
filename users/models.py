@@ -6,9 +6,6 @@ from django.db.models.signals import post_save
 import uuid
 
 
-AbstractUser._meta.get_field("email")._unique = True
-
-
 class Team(models.Model):
     name = models.CharField(max_length=256, unique=True, null=False)
 
