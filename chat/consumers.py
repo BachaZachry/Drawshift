@@ -23,21 +23,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if data.get("type") == "canvas_update":
             canvas_data = data.get("canvas_data")
-            await self.broadcast_canvas_update(canvas_data)
+            user = data.get("user_id")
+            await self.broadcast_canvas_update(canvas_data, user)
 
-    async def broadcast_canvas_update(self, canvas_data):
+    async def broadcast_canvas_update(self, canvas_data, user):
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "send_canvas_update", "canvas_data": canvas_data},
+            {"type": "send_canvas_update", "canvas_data": canvas_data, "user": user},
         )
 
     async def send_canvas_update(self, event):
         canvas_data = event["canvas_data"]
+        user = event["user"]
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "canvas_update",
                     "canvas_data": canvas_data,
+                    "user": user,
                 }
             )
         )
