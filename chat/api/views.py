@@ -1,4 +1,5 @@
-from chat.api.serializers import DrawingSerializer, DiagramSerializer
+from itertools import chain
+from chat.api.serializers import DrawingSerializer, DiagramSerializer, BoardsSerializer
 from chat.models import Drawing, Diagram
 from rest_framework import generics, permissions, mixins
 from rest_framework.response import Response
@@ -127,3 +128,62 @@ class RetrieveSingleDiagramAPIView(generics.RetrieveAPIView):
     serializer_class = DiagramSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Diagram.objects.all()
+
+
+class RetrieveUserBoardsAPIView(generics.GenericAPIView):
+    serializer_class = BoardsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        summary="Get combined data from drawings and diagrams",
+        description="Retrieves data from drawings and diagrams for the authenticated user.",
+        responses={
+            200: BoardsSerializer,
+        },
+        examples=[
+            OpenApiExample(
+                "Successful Response",
+                value={
+                    "drawings": [
+                        {
+                            "id": 1,
+                            "title": "title1",
+                            "path": ["x", "y"],
+                            "base64_image": "string",
+                        },
+                        {
+                            "id": 2,
+                            "title": "title2",
+                            "path": ["x", "y"],
+                            "base64_image": "string",
+                        },
+                    ],
+                    "diagrams": [
+                        {
+                            "id": 1,
+                            "title": "title1",
+                            "nodes": ["x", "y"],
+                            "edges": ["x", "y"],
+                            "base64_image": "string",
+                        },
+                        {
+                            "id": 2,
+                            "title": "title2",
+                            "nodes": ["x", "y"],
+                            "edges": ["x", "y"],
+                            "base64_image": "string",
+                        },
+                    ],
+                },
+                response_only=True,
+                status_codes=["200"],
+            ),
+        ],
+    )
+    def get(self):
+        diagrams = Diagram.objects.filter(user=self.request.user)
+        drawings = Drawing.objects.filter(user=self.request.user)
+        boards_data = {"drawings": drawings, "diagrams": diagrams}
+
+        serializer = BoardsSerializer(boards_data)
+        return Response(serializer.data)

@@ -11,6 +11,8 @@ class Drawing(models.Model):
 
 
 class Diagram(models.Model):
-    elements = ArrayField(models.JSONField())
+    nodes = ArrayField(models.JSONField(), null=True)
+    edges = ArrayField(models.JSONField(), null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=False)
+    base64_image = models.TextField(null=True, blank=True)

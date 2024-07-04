@@ -4,9 +4,11 @@ from .views import (
     DrawingAPIView,
     RetrieveSingleDrawingAPIView,
     RetrieveSingleDiagramAPIView,
+    RetrieveUserBoardsAPIView,
 )
 
 urlpatterns = [
+    path("", RetrieveUserBoardsAPIView.as_view()),
     path("drawing/", DrawingAPIView.as_view()),
     re_path(r"^drawing/(?P<pk>\d+)/", RetrieveSingleDrawingAPIView.as_view()),
     path("diagram/", DiagramAPIView.as_view()),

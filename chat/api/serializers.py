@@ -12,5 +12,10 @@ class DrawingSerializer(serializers.ModelSerializer):
 class DiagramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagram
-        fields = ["id", "elements", "title", "user"]
+        fields = ["id", "nodes", "edges", "title", "user", "base64_image"]
         extra_kwargs = {"user": {"default": serializers.CurrentUserDefault()}}
+
+
+class BoardsSerializer(serializers.Serializer):
+    diagrams = DiagramSerializer(many=True, read_only=True)
+    drawings = DrawingSerializer(many=True, read_only=True)
